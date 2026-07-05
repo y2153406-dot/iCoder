@@ -1,1 +1,1 @@
-web: gunicorn iCoder.wsgi
+web: gunicorn iCoder.wsgi:application
