@@ -1,0 +1,333 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{% block title %}Social Media{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+
+    <style>
+body {
+    background: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: .35s ease;
+}
+
+.card,
+.navbar,
+footer,
+.form-control,
+.input-group-text,
+.page-link,
+.list-group-item{
+
+    transition:.35s ease;
+
+}
+
+.navbar{
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+.navbar-brand{
+    padding: 0;
+}
+
+.navbar-logo{
+    height: 52px;
+    width: auto;
+    display: block;
+}
+
+@media (max-width:768px){
+
+    .navbar-logo{
+        height: 42px;
+    }
+
+}
+.content-wrapper {
+    flex: 1;
+    padding-top: 30px;
+    padding-bottom: 40px;
+}
+
+      footer {
+        background: white;
+        border-top: 1px solid #e5e5e5;
+        padding: 20px;
+        margin-top: 60px;
+        text-align: center;
+        color: #6c757d;
+      }
+      /* ================= DARK MODE ================= */
+
+      body.dark-mode {
+        background: #121212;
+        color: #f8f9fa;
+      }
+
+      body.dark-mode .card {
+        background: #1e1e1e;
+        color: white;
+      }
+
+      body.dark-mode .card-header {
+        background: #1e1e1e !important;
+        color: white;
+      }
+
+      body.dark-mode .navbar {
+        background: #1b1b1b !important;
+      }
+
+      body.dark-mode .navbar .nav-link,
+      body.dark-mode .navbar-brand {
+        color: white !important;
+      }
+
+      body.dark-mode footer {
+        background: #1b1b1b;
+        color: white;
+        border-top: none;
+      }
+
+      body.dark-mode .form-control,
+      body.dark-mode .input-group-text {
+        background: #2d2d2d;
+        color: white;
+        border-color: #444;
+      }
+
+      body.dark-mode .form-control::placeholder {
+        color: #bbb;
+      }
+
+      body.dark-mode .list-group-item {
+        background: #1e1e1e;
+        color: white;
+      }
+
+      body.dark-mode .alert-light {
+        background: #2d2d2d;
+        color: white;
+      }
+
+      body.dark-mode .page-link {
+        background: #1e1e1e;
+        color: white;
+        border-color: #444;
+      }
+
+      body.dark-mode .page-item.active .page-link {
+        background: #0d6efd;
+      }
+
+      body.dark-mode .text-muted {
+        color: #bdbdbd !important;
+      }
+      body.dark-mode .navbar-toggler{
+
+    border-color:#666;
+
+}
+
+body.dark-mode .navbar-toggler-icon{
+
+    filter:invert(1);
+
+}
+body.dark-mode .alert{
+
+    background:#2b2b2b;
+    color:white;
+    border-color:#444;
+
+}
+
+body.dark-mode #themeToggle{
+    color:white;
+    border-color:#666;
+}
+
+body.dark-mode #themeToggle:hover{
+    background:#333;
+}
+
+body.dark-mode .card-img-top{
+    border-bottom:1px solid #333;
+}
+    </style>
+
+    {% block extra_css %} {% endblock %}
+  </head>
+
+  <body>
+    <!-- Navbar -->
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+<a class="navbar-brand d-flex align-items-center gap-2"
+   href="{% url 'home' %}">
+
+    <img
+    src="{% static 'images/icoder-logo.png' %}?v=2"
+    alt="iCoder"
+    class="navbar-logo">
+
+</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+ 
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'home' %}">
+                <i class="bi bi-house"></i>
+                Home
+              </a>
+            </li>
+
+            {% if request.user.is_authenticated %}
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'create-post' %}">
+                <i class="bi bi-plus-square"></i>
+                Create Post
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'profile' request.user.id %}">
+                <i class="bi bi-person-circle"></i>
+                Profile
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'edit-profile' %}">
+                <i class="bi bi-pencil-square"></i>
+                Edit Profile
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}">
+                <i class="bi bi-box-arrow-right"></i>
+                Logout
+              </a>
+            </li>
+
+            {% else %}
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'loginn' %}">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Login
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'signup' %}">
+                <i class="bi bi-person-plus"></i>
+                Signup
+              </a>
+            </li>
+
+            {% endif %}
+          </ul>
+<button
+    id="themeToggle"
+    class="btn btn-outline-secondary ms-lg-3 mt-2 mt-lg-0">
+
+    <i class="bi bi-moon-stars-fill"></i>
+
+</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+
+    <div class="container content-wrapper">
+      <!-- Messages -->
+
+      {% for message in messages %}
+
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
+      {% endfor %} {% block content %} {% endblock %}
+    </div>
+
+    <!-- Footer -->
+
+    <footer>
+      <div class="container">
+        © 2026 iCoder • Built with Django & Bootstrap
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block extra_js %}{% endblock %}
+
+<script>
+const themeButton = document.getElementById("themeToggle");
+
+function enableDarkMode() {
+    document.body.classList.add("dark-mode");
+    themeButton.innerHTML = '<i class="bi bi-sun-fill"></i>';
+    localStorage.setItem("theme", "dark");
+}
+
+function disableDarkMode() {
+    document.body.classList.remove("dark-mode");
+    themeButton.innerHTML = '<i class="bi bi-moon-stars-fill"></i>';
+    localStorage.setItem("theme", "light");
+}
+
+if (localStorage.getItem("theme") === "dark") {
+    enableDarkMode();
+} else {
+    disableDarkMode();
+}
+
+themeButton.addEventListener("click", () => {
+    if (document.body.classList.contains("dark-mode")) {
+        disableDarkMode();
+    } else {
+        enableDarkMode();
+    }
+});
+</script>
+  </body>
+</html>
