@@ -181,6 +181,7 @@ def follow(request, user_id):
             Notification.objects.create(sender=request.user, receiver= user_to_follow, notification_type= 'follow')
         return redirect('profile', user_id=user_id)
 
+@login_required
 def home(request):
     # Post.objects.filter(user=request.user)
     # posts = Post.objects.order_by('-created_at')
