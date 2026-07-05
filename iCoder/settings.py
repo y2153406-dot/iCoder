@@ -137,3 +137,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "CSRF_TRUSTED_ORIGINS",
+    ""
+).split(",")
