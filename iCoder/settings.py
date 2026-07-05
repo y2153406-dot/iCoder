@@ -137,7 +137,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 
-CSRF_TRUSTED_ORIGINS = os.environ.get(
-    "CSRF_TRUSTED_ORIGINS",
-    ""
-).split(",")
+CSRF_TRUSTED_ORIGINS = []
+
+trusted_origins = os.environ.get("CSRF_TRUSTED_ORIGINS")
+
+if trusted_origins:
+    CSRF_TRUSTED_ORIGINS = trusted_origins.split(",")
