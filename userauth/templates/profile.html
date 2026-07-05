@@ -82,31 +82,57 @@
 
             {% else %}
 
-            <form
-              method="POST"
-              action="{% url 'follow-user' user_id %}"
-              class="mt-3"
-            >
-              {% csrf_token %} {% if is_following %}
+    {% if request.user.is_authenticated %}
 
-              <button class="btn btn-outline-danger">
-                <i class="bi bi-person-dash"></i>
+        <form
+            method="POST"
+            action="{% url 'follow-user' user_id %}"
+            class="mt-3">
 
-                Unfollow
-              </button>
+            {% csrf_token %}
 
-              {% else %}
+            {% if is_following %}
 
-              <button class="btn btn-primary">
-                <i class="bi bi-person-plus"></i>
+                <button
+                    type="submit"
+                    class="btn btn-outline-danger">
 
-                Follow
-              </button>
+                    <i class="bi bi-person-dash"></i>
 
-              {% endif %}
-            </form>
+                    Unfollow
+
+                </button>
+
+            {% else %}
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+
+                    <i class="bi bi-person-plus"></i>
+
+                    Follow
+
+                </button>
 
             {% endif %}
+
+        </form>
+
+    {% else %}
+
+        <a href="{% url 'loginn' %}"
+           class="btn btn-primary mt-3">
+
+            <i class="bi bi-person-plus"></i>
+
+            Follow
+
+        </a>
+
+    {% endif %}
+
+{% endif %}
           </div>
         </div>
       </div>

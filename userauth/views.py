@@ -112,60 +112,136 @@ def delete_post(request, post_id):
 
 
 
-@login_required
-def like_post(request,post_id):
-    post=Post.objects.get(id=post_id)
+@login_required(login_url='loginn')
+def like_post(request, post_id):
+
+    if request.method != 'POST':
+        return redirect('home')
+
+    post = get_object_or_404(Post, id=post_id)
+
     if Like.objects.filter(user=request.user, post=post).exists():
-        Like.objects.filter(user=request.user, post=post).delete()
+
+        Like.objects.filter(
+            user=request.user,
+            post=post
+        ).delete()
+
     else:
-        Like.objects.create(user=request.user,post=post)
+
+        Like.objects.create(
+            user=request.user,
+            post=post
+        )
+
         if request.user != post.user:
-            Notification.objects.create(sender=request.user, receiver=post.user, post=post, notification_type='like')
+
+            Notification.objects.create(
+                sender=request.user,
+                receiver=post.user,
+                post=post,
+                notification_type='like'
+            )
+
     return redirect('home')
 
 
-@login_required
+@login_required(login_url='loginn')
 def create_comment(request, post_id):
-    if request.method=='GET':
+
+    if request.method != 'POST':
         return redirect('home')
-    if request.method=='POST':
-        post=Post.objects.get(id=post_id)
-        user=request.user
-        content=request.POST.get('content').strip()
-        if content:
-            Comment.objects.create(user=user, post=post, content=content)
-            messages.success(request, 'Comment added successfully!')
-            if request.user != post.user:
-                Notification.objects.create(sender=request.user, receiver=post.user, notification_type='comment')
-            return redirect('home')
-        else:
-            messages.error(request, 'Comment box is empty add comment')
-            return redirect('home')
 
-@login_required
+    post = get_object_or_404(Post, id=post_id)
+
+    content = request.POST.get('content', '').strip()
+
+    if content:
+
+        Comment.objects.create(
+            user=request.user,
+            post=post,
+            content=content
+        )
+
+        messages.success(request, 'Comment added successfully!')
+
+        if request.user != post.user:
+
+            Notification.objects.create(
+                sender=request.user,
+                receiver=post.user,
+                post=post,
+                notification_type='comment'
+            )
+
+    else:
+
+        messages.error(request, 'Comment box is empty.')
+
+    return redirect('home')
+
+@login_required(login_url='loginn')
 def delete_comment(request, comment_id):
-    if request.method=='POST':
-        comment=get_object_or_404(Comment, id=comment_id)
-        if request.user==comment.user or request.user==comment.post.user:
-            comment.delete()
-            return redirect('home')
 
-@login_required
-def Profilee(request,user_id):
-    # profile=request.user.profile
-    profile_user= get_object_or_404(User, id=user_id)
-    profile=profile_user.profile
-    is_following=Follow.objects.filter(follower=request.user, following=profile_user).exists()
-    follower_count=Follow.objects.filter(following=profile_user).count()
-    following_count=Follow.objects.filter(follower=profile_user).count()
-    context={ 'profile_user':profile_user, 'is_following': is_following, 'user_id': user_id, 'profile' : profile, 'follower_count' : follower_count, 'following_count' : following_count}
+    if request.method != 'POST':
+        return redirect('home')
+
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.user == comment.user or request.user == comment.post.user:
+
+        comment.delete()
+        messages.success(request, 'Comment deleted successfully.')
+
+    else:
+
+        messages.error(request, 'You are not authorized to delete this comment.')
+
+    return redirect('home')
+
+def Profilee(request, user_id):
+
+    profile_user = get_object_or_404(User, id=user_id)
+
+    profile = profile_user.profile
+
+    if request.user.is_authenticated:
+
+        is_following = Follow.objects.filter(
+            follower=request.user,
+            following=profile_user
+        ).exists()
+
+    else:
+
+        is_following = False
+
+    follower_count = Follow.objects.filter(
+        following=profile_user
+    ).count()
+
+    following_count = Follow.objects.filter(
+        follower=profile_user
+    ).count()
+
+    context = {
+        'profile_user': profile_user,
+        'profile': profile,
+        'user_id': user_id,
+        'is_following': is_following,
+        'follower_count': follower_count,
+        'following_count': following_count,
+    }
+
     return render(request, 'profile.html', context)
 
-@login_required
+
+@login_required(login_url='loginn')
 def follow(request, user_id):
     user_to_follow = get_object_or_404(User, id=user_id)
-    if request.method=='GET':
-        return redirect( 'profile')
+    if request.method != 'POST':
+        return redirect('home')
     if request.method=='POST':
         follower=request.user
         following=get_object_or_404(User, id=user_id)
@@ -181,46 +257,59 @@ def follow(request, user_id):
             Notification.objects.create(sender=request.user, receiver= user_to_follow, notification_type= 'follow')
         return redirect('profile', user_id=user_id)
 
-@login_required
+ 
 def home(request):
-    # Post.objects.filter(user=request.user)
-    # posts = Post.objects.order_by('-created_at')
-    query=request.GET.get('q', "").strip()
+
+    query = request.GET.get('q', "").strip()
+
     if query != "":
-        users=User.objects.filter(username__icontains=query)
+        users = User.objects.filter(username__icontains=query)
     else:
-        users=User.objects.none()
-    searched_performed= bool(query)
-    # ------------------HOMEFEED FEATURE--------
-    
-    following_ids = set(
-    Follow.objects.filter(
-        follower=request.user
-    ).values_list('following', flat=True)
-) 
-    # if following_ids:
-    #     posts=Post.objects.filter (Q(user=request.user) | Q(user__in = following_ids)).order_by('-created_at') 
-    # else:
-    #     posts=Post.objects.order_by('-created_at')
+        users = User.objects.none()
+
+    searched_performed = bool(query)
+
+    # ---------------- HOME FEED ----------------
+
     posts = Post.objects.order_by('-created_at')
+
+    if request.user.is_authenticated:
+
+        following_ids = set(
+            Follow.objects.filter(
+                follower=request.user
+            ).values_list('following', flat=True)
+        )
+
+        saved_post_ids = SavedPost.objects.filter(
+            user=request.user
+        ).values_list('post', flat=True)
+
+    else:
+
+        following_ids = set()
+        saved_post_ids = []
 
     for post in posts:
         post.is_following = post.user.id in following_ids
 
-    paginator= Paginator(posts, 10)
-    page_number=request.GET.get('page')
-    page_obj= paginator.get_page(page_number)
+    # ---------------- PAGINATION ----------------
 
-    saved_post_ids=SavedPost.objects.filter(user=request.user).values_list('post', flat=True)
-    context={
+    paginator = Paginator(posts, 10)
 
+    page_number = request.GET.get('page')
+
+    page_obj = paginator.get_page(page_number)
+
+    context = {
         'query': query,
         'users': users,
         'searched_performed': searched_performed,
         'saved_post_ids': saved_post_ids,
         'following_ids': following_ids,
-        'page_obj': page_obj
+        'page_obj': page_obj,
     }
+
     return render(request, 'home.html', context)
 
 @login_required
@@ -286,14 +375,30 @@ def edit_post(request, post_id):
         return redirect('home')
 
 
-@login_required
+@login_required(login_url='loginn')
 def save_post(request, post_id):
-    post=Post.objects.get(id=post_id)
-    saved_post=SavedPost.objects.filter(user=request.user, post=post)
+
+    if request.method != 'POST':
+        return redirect('home')
+
+    post = get_object_or_404(Post, id=post_id)
+
+    saved_post = SavedPost.objects.filter(
+        user=request.user,
+        post=post
+    )
+
     if saved_post.exists():
+
         saved_post.delete()
+
     else:
-        SavedPost.objects.create(user=request.user, post=post)
+
+        SavedPost.objects.create(
+            user=request.user,
+            post=post
+        )
+
     return redirect('home')
 
 

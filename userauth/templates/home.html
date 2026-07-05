@@ -99,37 +99,53 @@ Home
 
                 {% if request.user != post.user %}
 
-                <form method="POST"
-                      action="{% url 'follow-user' post.user.id %}">
+    {% if request.user.is_authenticated %}
 
-                    {% csrf_token %}
+        <form method="POST"
+              action="{% url 'follow-user' post.user.id %}">
 
-                    {% if post.is_following %}
+            {% csrf_token %}
 
-                        <button class="btn btn-outline-danger btn-sm">
+            {% if post.is_following %}
 
-                            <i class="bi bi-person-dash-fill"></i>
+                <button type="submit"
+        class="btn btn-outline-danger btn-sm">
 
-                            Unfollow
+                    <i class="bi bi-person-dash-fill"></i>
 
-                        </button>
+                    Unfollow
 
-                    {% else %}
+                </button>
 
-                        <button class="btn btn-primary btn-sm">
+            {% else %}
 
-                            <i class="bi bi-person-plus-fill"></i>
+            <button type="submit"
+        class="btn btn-primary btn-sm">
 
-                            Follow
+                    <i class="bi bi-person-plus-fill"></i>
 
-                        </button>
+                    Follow
 
-                    {% endif %}
+                </button>
 
-                </form>
+            {% endif %}
 
-                {% endif %}
+        </form>
 
+    {% else %}
+
+        <a href="{% url 'loginn' %}"
+           class="btn btn-primary btn-sm">
+
+            <i class="bi bi-person-plus-fill"></i>
+
+            Follow
+
+        </a>
+
+    {% endif %}
+
+{% endif %}
             </div>
 
             <!-- Image -->
@@ -157,197 +173,268 @@ Home
 
                 </p>
 
-                <!-- Like & Save -->
+               <!-- Like & Save -->
 
-                <div class="d-flex align-items-center gap-3 mb-3">
+<div class="d-flex align-items-center gap-3 mb-3">
 
-                    <a href="{% url 'like-post' post.id %}"
-                       class="btn btn-outline-danger btn-sm">
+    {% if request.user.is_authenticated %}
 
-                        <i class="bi bi-heart-fill"></i>
+<form method="POST"
+      action="{% url 'like-post' post.id %}"
+      class="d-inline">
 
-                        Like
+    {% csrf_token %}
 
-                    </a>
+    <button type="submit"
+            class="btn btn-outline-danger btn-sm">
 
-                    <span class="fw-semibold">
+        <i class="bi bi-heart-fill"></i>
 
-                        ❤️ {{ post.likes.count }} Likes
+        Like
 
-                    </span>
+    </button>
 
-                    <form method="POST"
-                          action="{% url 'save-post' post.id %}">
+</form>
 
-                        {% csrf_token %}
+{% else %}
 
-                        {% if post.id in saved_post_ids %}
+<a href="{% url 'loginn' %}"
+   class="btn btn-outline-danger btn-sm">
 
-                            <button class="btn btn-warning btn-sm">
+    <i class="bi bi-heart-fill"></i>
 
-                                <i class="bi bi-bookmark-fill"></i>
+    Like
 
-                                Unsave
+</a>
 
-                            </button>
+{% endif %}
+    <span class="fw-semibold">
 
-                        {% else %}
+        ❤️ {{ post.likes.count }} Likes
 
-                            <button class="btn btn-outline-warning btn-sm">
+    </span>
 
-                                <i class="bi bi-bookmark"></i>
+    {% if request.user.is_authenticated %}
 
-                                Save
+        <form method="POST"
+              action="{% url 'save-post' post.id %}">
 
-                            </button>
+            {% csrf_token %}
 
-                        {% endif %}
+            {% if post.id in saved_post_ids %}
 
-                    </form>
+                <button type="submit"
+        class="btn btn-warning btn-sm">
 
-                </div>
+                    <i class="bi bi-bookmark-fill"></i>
 
-                       <!-- Comment Form -->
+                    Unsave
 
-                <form method="POST"
-                      action="{% url 'create_comment' post.id %}"
-                      class="mb-4">
+                </button>
 
-                    {% csrf_token %}
+            {% else %}
 
-                    <div class="input-group">
+                <button type="submit"
+        class="btn btn-outline-warning btn-sm">
 
-                        <input
-                            type="text"
-                            name="content"
-                            class="form-control"
-                            placeholder="Write a comment..."
-                            required>
+                    <i class="bi bi-bookmark"></i>
 
-                        <button
-                            class="btn btn-success"
-                            type="submit">
+                    Save
 
-                            <i class="bi bi-send-fill"></i>
+                </button>
 
-                            Comment
+            {% endif %}
 
-                        </button>
+        </form>
 
-                    </div>
+    {% else %}
 
-                </form>
+        <a href="{% url 'loginn' %}"
+           class="btn btn-outline-warning btn-sm">
 
-                <!-- Comments -->
+            <i class="bi bi-bookmark"></i>
 
-                <h6 class="fw-bold mb-3">
+            Save
 
-                    <i class="bi bi-chat-left-text"></i>
+        </a>
 
-                    Comments
+    {% endif %}
 
-                </h6>
+</div>
+<!-- Comment Form -->
 
-                {% for comment in post.comments.all %}
+{% if request.user.is_authenticated %}
 
-                    <div class="card border-0 bg-light mb-3">
+<form method="POST"
+      action="{% url 'create_comment' post.id %}"
+      class="mb-4">
 
-                        <div class="card-body py-2">
+    {% csrf_token %}
 
-                            <div class="d-flex justify-content-between align-items-start">
+    <div class="input-group">
 
-                                <div>
+        <input
+            type="text"
+            name="content"
+            class="form-control"
+            placeholder="Write a comment..."
+            required>
 
-                                    <strong>
+        <button
+            class="btn btn-success"
+            type="submit">
 
-                                        {{ comment.user.username }}
+            <i class="bi bi-send-fill"></i>
 
-                                    </strong>
+            Comment
 
-                                    <p class="mb-1">
+        </button>
 
-                                        {{ comment.content }}
+    </div>
 
-                                    </p>
+</form>
 
-                                    <small class="text-muted">
+{% else %}
 
-                                        <i class="bi bi-clock"></i>
+<form method="GET"
+      action="{% url 'loginn' %}"
+      class="mb-4">
 
-                                        {{ comment.created_at }}
+    <div class="input-group">
 
-                                    </small>
+        <input
+            type="text"
+            class="form-control"
+            placeholder="Write a comment..."
+            readonly>
 
-                                </div>
+        <button
+            class="btn btn-success"
+            type="submit">
 
-                                {% if request.user == comment.user or request.user == comment.post.user %}
+            <i class="bi bi-send-fill"></i>
 
-                                <form method="POST"
-                                      action="{% url 'delete-comment' comment.id %}">
+            Comment
 
-                                    {% csrf_token %}
+        </button>
 
-                                    <button
-                                        class="btn btn-sm btn-outline-danger">
+    </div>
 
-                                        <i class="bi bi-trash"></i>
+</form>
 
-                                    </button>
+{% endif %}
 
-                                </form>
+<!-- Comments -->
 
-                                {% endif %}
+<h6 class="fw-bold mb-3">
 
-                            </div>
+    <i class="bi bi-chat-left-text"></i>
 
-                        </div>
+    Comments
 
-                    </div>
+</h6>
 
-                {% empty %}
+{% for comment in post.comments.all %}
 
-                    <div class="alert alert-light border text-center">
+<div class="card border-0 bg-light mb-3">
 
-                        No comments yet.
+    <div class="card-body py-2">
 
-                    </div>
+        <div class="d-flex justify-content-between align-items-start">
 
-                {% endfor %}
+            <div>
 
-                <!-- Owner Actions -->
+                <strong>
 
-                {% if request.user == post.user %}
+                    {{ comment.user.username }}
 
-                <div class="d-flex gap-2 mt-3">
+                </strong>
 
-                    <a href="{% url 'edit-post' post.id %}"
-                       class="btn btn-outline-primary">
+                <p class="mb-1">
 
-                        <i class="bi bi-pencil-square"></i>
+                    {{ comment.content }}
 
-                        Edit
+                </p>
 
-                    </a>
+                <small class="text-muted">
 
-                    <a href="{% url 'delete-post' post.id %}"
-                       class="btn btn-outline-danger">
+                    <i class="bi bi-clock"></i>
 
-                        <i class="bi bi-trash"></i>
+                    {{ comment.created_at }}
 
-                        Delete
-
-                    </a>
-
-                </div>
-
-                {% endif %}
+                </small>
 
             </div>
 
+            {% if request.user.is_authenticated %}
+
+                {% if request.user == comment.user or request.user == comment.post.user %}
+
+                <form method="POST"
+                      action="{% url 'delete-comment' comment.id %}">
+
+                    {% csrf_token %}
+
+                    <button
+                        class="btn btn-sm btn-outline-danger">
+
+                        <i class="bi bi-trash"></i>
+
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+            {% endif %}
+
         </div>
 
-        {% endfor %}
+    </div>
 
+</div>
+
+{% empty %}
+
+<div class="alert alert-light border text-center">
+
+    No comments yet.
+
+</div>
+
+{% endfor %}
+
+<!-- Owner Actions -->
+
+{% if request.user.is_authenticated %}
+
+    {% if request.user == post.user %}
+
+    <div class="d-flex gap-2 mt-3">
+
+        <a href="{% url 'edit-post' post.id %}"
+           class="btn btn-outline-primary">
+
+            <i class="bi bi-pencil-square"></i>
+
+            Edit
+
+        </a>
+
+        <a href="{% url 'delete-post' post.id %}"
+           class="btn btn-outline-danger">
+
+            <i class="bi bi-trash"></i>
+
+            Delete
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+{% endif %}
         <!-- Pagination -->
 
         <nav class="mt-4">
