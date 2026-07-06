@@ -149,11 +149,12 @@ Home
             </div>
 
             <!-- Image -->
-
-            <img
-                src="{{ post.image.url }}"
-                class="card-img-top img-fluid"
-                alt="Post Image">
+{% if post.image %}
+<img
+    src="{{ post.image.url }}"
+    class="card-img-top img-fluid"
+    alt="Post Image">
+{% endif %}
 
             <!-- Body -->
 
